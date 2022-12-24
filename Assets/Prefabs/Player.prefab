@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 1142383159812403229}
   - component: {fileID: 8259881075402955415}
   - component: {fileID: 6261989039030180583}
-  - component: {fileID: 6033700874598950618}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -112,6 +111,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 815107ce02e004b44b8a987fddbce596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  level: 0
+  levelTime: 0
+  timer: {fileID: 0}
+  winStatus: {fileID: 0}
+  winTimer: {fileID: 0}
 --- !u!54 &6261989039030180583
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -128,15 +132,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6033700874598950618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1142383159812403230}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de7d4fdb6c3445c4883f9a3d7ee7fc6b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

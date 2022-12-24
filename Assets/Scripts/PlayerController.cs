@@ -6,21 +6,27 @@ using TMPro;
 
 public class PlayerController : MonoBehaviour {
 
-	public int level;
 	public float levelTime;
 	public TextMeshProUGUI timer;
+	public TextMeshProUGUI winStatus;
+	public TextMeshProUGUI winTimer;
 
 	private Rigidbody rb;
+
 	private float time;
 	private float timerStart;
 	private float timeElapsed;
 	private float timeRemaining;
+	private float bestTime;
 	private int minutes;
 	private string timerString;
+
 	private bool playerControl = true;
 	private bool finished = false;
 	private bool dead = false;
-	private bool firstFrame = false;
+	private bool firstFrame = true;
+
+	private int level;
 
 	private void Start() {
 		rb = GetComponent<Rigidbody>();
@@ -30,13 +36,20 @@ public class PlayerController : MonoBehaviour {
 
 		timerStart = Time.time;
 
-		Debug.Log(SceneManager.sceneCount);
+		winStatus.text = "";
+		winTimer.text = "";
+
+		if (PlayerPrefs.GetInt("level" + level.ToString()) != 1) {
+			PlayerPrefs.SetInt("level" + level.ToString(), 1);
+			PlayerPrefs.Save();
+		}
+
 	}
 
 	private void Update() {
 		//TODO: Maybe create a save system (but prolly not)
 		if (Input.GetKeyDown(KeyCode.Escape)) {
-			Application.Quit();
+			SceneManager.LoadSceneAsync(0);
 		}
 
 		UpdateTimer();
@@ -44,9 +57,9 @@ public class PlayerController : MonoBehaviour {
 		//La fonction elle-même vérifie à seulement un instant, donc elle est insérée dans Update() pour être répétée à chaque frame
 		if (finished) {
 			SceneLoadTimer(time);
-        } else if (dead) {
+		} else if (dead) {
 			SceneLoadTimer(time);
-        }
+		}
 
 	}
 
@@ -69,13 +82,34 @@ public class PlayerController : MonoBehaviour {
 			//S'assurer qu'un joueur qui perd ne peut pas rentrer dans le but
 			if (!dead) {
 				level++;
+				finished = true;
+				time = Time.time;
 			}
-			time = Time.time;
-			finished = true;
 		}
 	}
 	
 	private void SceneLoadTimer(float sceneTimer) {
+
+		if (dead) {
+			winStatus.text = "Perdu...";
+		} else {
+
+			if (!PlayerPrefs.HasKey("level" + (level - 1).ToString() + "time")) {
+
+				PlayerPrefs.SetFloat("level" + (level - 1).ToString() + "time", timeElapsed);
+
+			//Comparer le temps précédent avec le nouveau temps
+			} else if (timeElapsed < PlayerPrefs.GetFloat("level" + (level - 1).ToString() + "time")) {
+
+				PlayerPrefs.SetFloat("level" + (level - 1).ToString() + "time", timeElapsed);
+
+			}
+
+			bestTime = PlayerPrefs.GetFloat("level" + (level - 1).ToString() + "time");
+
+			winStatus.text = "Gagné!";
+			winTimer.text = string.Format("Complété en: {0}:{1:00.00}\nMeilleur temps: {2}:{3:00.00}", (int)timeElapsed / 60, timeElapsed % 60, (int)bestTime / 60, bestTime % 60);
+		}
 
 		//Attend soit 5 secondes, ou jusqu'à ce que le joueur appuye un bouton
 		if ((Time.time - sceneTimer < 5.0f && Time.time - sceneTimer > 0.05f && Input.anyKeyDown) || (Time.time - sceneTimer >= 5.0f)) {
@@ -97,10 +131,10 @@ public class PlayerController : MonoBehaviour {
 			minutes = (int)timeRemaining / 60;
 
 			//J'utilise la variable firstFrame afin de m'assurer que la variable time est seulement prise une fois, et qu'elle n'est pas mise à jour constamment
-		} else if (!firstFrame) {
+		} else if (!finished && firstFrame) {
 			dead = true;
 			playerControl = false;
-			firstFrame = true;
+			firstFrame = false;
 			time = Time.time;
 		}
 
