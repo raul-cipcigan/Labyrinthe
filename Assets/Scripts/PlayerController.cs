@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour {
 		winStatus.text = "";
 		winTimer.text = "";
 
-		if (PlayerPrefs.GetInt("level" + level.ToString()) != 1) {
+		if (!PlayerPrefs.HasKey("level" + level.ToString())) {
 			PlayerPrefs.SetInt("level" + level.ToString(), 1);
 			PlayerPrefs.Save();
 		}
@@ -47,7 +47,6 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void Update() {
-		//TODO: Maybe create a save system (but prolly not)
 		if (Input.GetKeyDown(KeyCode.Escape)) {
 			SceneManager.LoadSceneAsync(0);
 		}
@@ -85,6 +84,12 @@ public class PlayerController : MonoBehaviour {
 				finished = true;
 				time = Time.time;
 			}
+		} else if (other.gameObject.CompareTag("Deathbox")) {
+			dead = true;
+			playerControl = false;
+			time = Time.time;
+			firstFrame = false;
+			winTimer.text = "Touché une zone rouge...";
 		}
 	}
 	
@@ -114,8 +119,11 @@ public class PlayerController : MonoBehaviour {
 		//Attend soit 5 secondes, ou jusqu'à ce que le joueur appuye un bouton
 		if ((Time.time - sceneTimer < 5.0f && Time.time - sceneTimer > 0.05f && Input.anyKeyDown) || (Time.time - sceneTimer >= 5.0f)) {
 
-			SceneManager.LoadSceneAsync(level);
-			
+			if (level <= 5) {
+				SceneManager.LoadSceneAsync(level);
+			} else {
+				SceneManager.LoadSceneAsync(0);
+			}
 		} 
 	}
 
@@ -136,6 +144,7 @@ public class PlayerController : MonoBehaviour {
 			playerControl = false;
 			firstFrame = false;
 			time = Time.time;
+			winTimer.text = "Le temps s'est écoulé...";
 		}
 
 		timerString = string.Format("{0}:{1:00.00}", minutes, timeRemaining % 60);
