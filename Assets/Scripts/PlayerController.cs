@@ -21,7 +21,8 @@ public class PlayerController : MonoBehaviour {
 	private int minutes;
 	private string timerString;
 
-	private bool playerControl = true;
+	private bool playerControl = false;
+	private bool started = false;
 	private bool finished = false;
 	private bool dead = false;
 	private bool firstFrame = true;
@@ -33,8 +34,6 @@ public class PlayerController : MonoBehaviour {
 
 		//Obtient le numéro du niveau
 		level = SceneManager.GetActiveScene().buildIndex;
-
-		timerStart = Time.time;
 
 		winStatus.text = "";
 		winTimer.text = "";
@@ -70,6 +69,10 @@ public class PlayerController : MonoBehaviour {
 
 		if (playerControl) {
 			rb.AddForce(mov * 10);
+		} else if (Input.anyKeyDown && !dead && !finished) {
+			playerControl = true;
+			started = true;
+			timerStart = Time.time;
 		}
 	}
 
@@ -117,7 +120,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		//Attend soit 5 secondes, ou jusqu'à ce que le joueur appuye un bouton
-		if ((Time.time - sceneTimer < 5.0f && Time.time - sceneTimer > 0.05f && Input.anyKeyDown) || (Time.time - sceneTimer >= 5.0f)) {
+		if ((Time.time - sceneTimer < 5.0f && Time.time - sceneTimer > 0.1f && Input.anyKeyDown) || (Time.time - sceneTimer >= 5.0f)) {
 
 			if (level <= 5) {
 				SceneManager.LoadSceneAsync(level);
@@ -129,8 +132,12 @@ public class PlayerController : MonoBehaviour {
 
 	private void UpdateTimer() {
 
-		if (!finished && (timeElapsed.CompareTo(levelTime) < 0)) {
-			timeElapsed = Time.time - timerStart;
+		if (!finished && timeElapsed < levelTime) {
+			if (started) {
+				timeElapsed = Time.time - timerStart;
+			} else {
+				timeElapsed = 0.0f;
+			}
 
 			//J'arrondis pour avoir seulement 2 points après la décimale
 			timeElapsed = Mathf.Floor(timeElapsed * 100) / 100;
