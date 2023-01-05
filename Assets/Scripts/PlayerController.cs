@@ -50,6 +50,10 @@ public class PlayerController : MonoBehaviour {
 			SceneManager.LoadSceneAsync(0);
 		}
 
+		if (Input.GetKeyDown(KeyCode.R)) {
+			SceneManager.LoadSceneAsync(level);
+		}
+
 		UpdateTimer();
 
 		//La fonction elle-même vérifie à seulement un instant, donc elle est insérée dans Update() pour être répétée à chaque frame
@@ -98,7 +102,7 @@ public class PlayerController : MonoBehaviour {
 	
 	private void SceneLoadTimer(float sceneTimer) {
 
-		if (dead) {
+		if (dead && !finished) {
 			winStatus.text = "Perdu...";
 		} else {
 

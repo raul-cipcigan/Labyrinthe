@@ -5,7 +5,7 @@ using UnityEngine;
 public class CameraController : MonoBehaviour {
 
 	public GameObject player;
-	public float maxRadius;
+	private float maxRadius = 1.5f;
 	private Vector3 offset;
 	private Vector3 camPos;
 	private float interpolant;
